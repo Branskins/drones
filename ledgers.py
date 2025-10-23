@@ -24,12 +24,25 @@ def main():
     )
     parse_ledger(response)
 
-def parse_ledger(response: http.client.HTTPResponse):
-    decoded_json = json.loads(response.read())
-    ledger = decoded_json["result"]["ledger"]
+def save_ledger(ledger):
     df = pd.DataFrame.from_dict(ledger, orient='index')
     df.reset_index(names='ledger_id', inplace=True)
-    print(df.head())
+    df.to_csv('ledgers.csv', index=False)
+
+def parse_ledger(response: http.client.HTTPResponse):
+    decoded_json = json.loads(response.read())
+
+    # Check for errors in the response
+    if 'error' in decoded_json and decoded_json['error']:
+        error_msg = ', '.join(decoded_json['error'])
+        raise ValueError(error_msg)
+
+    # Check if result exists
+    if 'result' not in decoded_json or 'ledger' not in decoded_json['result']:
+        raise ValueError("Missing 'result' or 'ledger'")
+
+    ledger = decoded_json["result"]["ledger"]
+    return ledger
 
 def request(method: str = "GET", path: str = "", query: dict | None = None, body: dict | None = None, public_key: str = "", private_key: str = "", environment: str = "") -> http.client.HTTPResponse:
     url = environment + path
