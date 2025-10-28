@@ -11,6 +11,7 @@ import urllib.request
 import pandas as pd
 from dotenv import load_dotenv
 
+
 def main():
     load_dotenv()
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
@@ -22,14 +23,57 @@ def main():
         private_key=PRIVATE_KEY,
         environment="https://api.kraken.com",
     )
-    parse_ledger(response)
+    ledger = parse_ledger(response)
 
-def save_ledger(ledger):
+    df = pd.DataFrame.from_dict(ledger, orient='index')
+    df.reset_index(names='ledger_id', inplace=True)
+    
+    df_deposits = df[df['type'] == 'deposit']
+    df_deposits = df_deposits[['type', 'amount', 'fee']]
+
+    for row in df_deposits.itertuples():
+        print(row)
+
+def save_to_notion(ledger: dict):
+    url = 'https://api.notion.com/v1/pages'
+    NOTION_TOKEN = os.environ.get('NOTION_TOKEN')
+    DATABASE_ID = os.environ.get('DATABASE_ID')
+    _type, amount, fee = ledger.values()
+
+    headers = {
+        "Authorization": "Bearer " + NOTION_TOKEN,
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    page = {
+        "parent": {
+            "database_id": DATABASE_ID
+        },
+        "properties": {
+            "type": {
+                "title": [{ "text": { "content": _type } }]
+            },
+            "amount": { "number": amount },
+            "fee": { "number": fee }
+        }
+    }
+
+    body_str = json.dumps(page)
+    req = urllib.request.Request(
+        method='POST',
+        url=url,
+        data=body_str.encode(),
+        headers=headers,
+    )
+    response = urllib.request.urlopen(req)
+    return response.status
+
+def save_ledger(ledger: dict):
     df = pd.DataFrame.from_dict(ledger, orient='index')
     df.reset_index(names='ledger_id', inplace=True)
     df.to_csv('ledgers.csv', index=False)
 
-def parse_ledger(response: http.client.HTTPResponse):
+def parse_ledger(response: http.client.HTTPResponse) -> dict:
     decoded_json = json.loads(response.read())
 
     # Check for errors in the response
