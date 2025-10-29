@@ -7,6 +7,8 @@ import os
 import time
 import urllib.parse
 import urllib.request
+from collections.abc import Mapping
+from typing import Any
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -29,16 +31,16 @@ def main():
     df.reset_index(names='ledger_id', inplace=True)
     
     df_deposits = df[df['type'] == 'deposit']
-    df_deposits = df_deposits[['type', 'amount', 'fee']]
+    df_deposits = df_deposits[['type', 'amount', 'fee']].astype({'amount': float, 'fee': float})
 
-    for row in df_deposits.itertuples():
-        print(row)
+    for ledger in df_deposits.itertuples(index=False):
+        status = save_to_notion(ledger)
 
-def save_to_notion(ledger: dict):
+def save_to_notion(ledger: Mapping[str, Any]):
     url = 'https://api.notion.com/v1/pages'
     NOTION_TOKEN = os.environ.get('NOTION_TOKEN')
     DATABASE_ID = os.environ.get('DATABASE_ID')
-    _type, amount, fee = ledger.values()
+    _type, amount, fee = ledger
 
     headers = {
         "Authorization": "Bearer " + NOTION_TOKEN,
