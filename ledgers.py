@@ -30,7 +30,7 @@ def main():
     df = pd.DataFrame.from_dict(ledger, orient='index')
     df.reset_index(names='ledger_id', inplace=True)
     
-    df_deposits = df[df['type'] == 'deposit']
+    df_deposits = df[df['type'].isin(['deposit', 'receive', 'spend'])]
     df_deposits = df_deposits[['type', 'amount', 'fee']].astype({'amount': float, 'fee': float})
 
     for ledger in df_deposits.itertuples(index=False):
