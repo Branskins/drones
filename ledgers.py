@@ -1,3 +1,4 @@
+import argparse
 import base64
 import hashlib
 import hmac
@@ -15,6 +16,14 @@ from dotenv import load_dotenv
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'output',
+        choices=['notion', 'csv', 'ledger'],
+        help='Output format: notion (save to Notion), csv (save to CSV file), or ledger (print ledger data)'
+    )
+    args = parser.parse_args()
+
     load_dotenv()
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
     PRIVATE_KEY = os.environ.get('PRIVATE_KEY')
@@ -27,14 +36,20 @@ def main():
     )
     ledger = parse_ledger(response)
 
-    df = pd.DataFrame.from_dict(ledger, orient='index')
-    df.reset_index(names='ledger_id', inplace=True)
-    
-    df_deposits = df[df['type'].isin(['deposit', 'receive', 'spend'])]
-    df_deposits = df_deposits[['type', 'amount', 'fee']].astype({'amount': float, 'fee': float})
+    if args.output == 'ledger':
+        print(json.dumps(ledger, indent=4))
+    elif args.output == 'csv':
+        save_ledger(ledger['result']['ledger'])
+        print('Saved to CSV')
+    elif args.output == 'notion':
+        df = pd.DataFrame.from_dict(ledger['result']['ledger'], orient='index')
+        df.reset_index(names='ledger_id', inplace=True)
+        df_deposits = df[df['type'].isin(['deposit', 'receive', 'spend'])]
+        df_deposits = df_deposits[['type', 'amount', 'fee']].astype({'amount': float, 'fee': float})
 
-    for ledger in df_deposits.itertuples(index=False):
-        status = save_to_notion(ledger)
+        for ledger in df_deposits.itertuples(index=False):
+            status = save_to_notion(ledger)
+            print(f'Saved to Notion with status: {status}')
 
 def save_to_notion(ledger: Mapping[str, Any]):
     url = 'https://api.notion.com/v1/pages'
@@ -87,8 +102,7 @@ def parse_ledger(response: http.client.HTTPResponse) -> dict:
     if 'result' not in decoded_json or 'ledger' not in decoded_json['result']:
         raise ValueError("Missing 'result' or 'ledger'")
 
-    ledger = decoded_json["result"]["ledger"]
-    return ledger
+    return decoded_json
 
 def request(method: str = "GET", path: str = "", query: dict | None = None, body: dict | None = None, public_key: str = "", private_key: str = "", environment: str = "") -> http.client.HTTPResponse:
     url = environment + path
@@ -142,5 +156,5 @@ def sign(private_key: str, message: bytes) -> str:
     ).decode()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
