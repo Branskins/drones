@@ -30,6 +30,10 @@ def main():
     response = request(
         method="POST",
         path="/0/private/Ledgers",
+        body={
+            "type": "sale",
+            "ofs": 0
+        },
         public_key=PUBLIC_KEY,
         private_key=PRIVATE_KEY,
         environment="https://api.kraken.com",
