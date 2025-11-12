@@ -13,13 +13,14 @@ from typing import Any
 
 import pandas as pd
 from dotenv import load_dotenv
+from supabase import Client, create_client
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'output',
-        choices=['notion', 'csv', 'ledger'],
+        choices=['notion', 'csv', 'ledger', 'db'],
         help='Output format: notion (save to Notion), csv (save to CSV file), or ledger (print ledger data)'
     )
     args = parser.parse_args()
@@ -27,6 +28,9 @@ def main():
     load_dotenv()
     PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
     PRIVATE_KEY = os.environ.get('PRIVATE_KEY')
+    url: str = os.environ.get("SUPABASE_URL")
+    key: str = os.environ.get("SUPABASE_KEY")
+
     response = request(
         method="POST",
         path="/0/private/Ledgers",
@@ -42,6 +46,8 @@ def main():
 
     if args.output == 'ledger':
         print(json.dumps(ledger, indent=4))
+    elif args.output == 'db':
+        supabase: Client = create_client(url, key)
     elif args.output == 'csv':
         save_ledger(ledger['result']['ledger'])
         print('Saved to CSV')
