@@ -20,8 +20,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'output',
-        choices=['notion', 'csv', 'ledger', 'db'],
-        help='Output format: notion (save to Notion), csv (save to CSV file), or ledger (print ledger data)'
+        choices=['csv', 'ledger', 'db'],
+        help='Output format: csv (save to CSV file), ledger (print ledger data) or db (save to Supabase) '
     )
     args = parser.parse_args()
 
@@ -31,69 +31,73 @@ def main():
     url: str = os.environ.get("SUPABASE_URL")
     key: str = os.environ.get("SUPABASE_KEY")
 
-    response = request(
-        method="POST",
-        path="/0/private/Ledgers",
-        body={
-            "type": "sale",
-            "ofs": 0
-        },
-        public_key=PUBLIC_KEY,
-        private_key=PRIVATE_KEY,
-        environment="https://api.kraken.com",
-    )
-    ledger = parse_ledger(response)
-
     if args.output == 'ledger':
+        response = request(
+            method="POST",
+            path="/0/private/Ledgers",
+            public_key=PUBLIC_KEY,
+            private_key=PRIVATE_KEY,
+            environment="https://api.kraken.com",
+        )
+        ledger = parse_ledger(response)
+
         print(json.dumps(ledger, indent=4))
     elif args.output == 'db':
+        ledgers = {}
+        offset = 0
+        batch_size = 50
         supabase: Client = create_client(url, key)
+
+        while True:
+            response = request(
+                method="POST",
+                path="/0/private/Ledgers",
+                body = {
+                    "ofs": offset
+                },
+                public_key=PUBLIC_KEY,
+                private_key=PRIVATE_KEY,
+                environment="https://api.kraken.com",
+            )
+
+            ledger = parse_ledger(response)
+            ledgers.update(ledger['result']['ledger'])
+
+            if len(ledger['result']['ledger']) < batch_size:
+                break
+
+            offset += batch_size
+
+            time.sleep(1)
+
+        df = pd.DataFrame.from_dict(ledgers, orient='index')
+        df.reset_index(names='ledger_id', inplace=True)
+        # df = df[df['type'].isin(['deposit', 'receive', 'spend'])]
+        df = df[['ledger_id', 'amount', 'asset', 'balance', 'fee' , 'refid', 'time', 'type']]
+        df = df.astype({'amount': float, 'balance': float, 'fee': float, 'time': int})
+        
+        try:
+            response = (
+                supabase.table('ledgers')
+                .insert(df.to_dict(orient='records'))
+                .execute()
+            )
+            print(response)
+        except Exception as exception:
+            print(exception)
+
     elif args.output == 'csv':
+        response = request(
+            method="POST",
+            path="/0/private/Ledgers",
+            public_key=PUBLIC_KEY,
+            private_key=PRIVATE_KEY,
+            environment="https://api.kraken.com",
+        )
+        ledger = parse_ledger(response)
+
         save_ledger(ledger['result']['ledger'])
         print('Saved to CSV')
-    elif args.output == 'notion':
-        df = pd.DataFrame.from_dict(ledger['result']['ledger'], orient='index')
-        df.reset_index(names='ledger_id', inplace=True)
-        df_deposits = df[df['type'].isin(['deposit', 'receive', 'spend'])]
-        df_deposits = df_deposits[['type', 'amount', 'fee']].astype({'amount': float, 'fee': float})
-
-        for ledger in df_deposits.itertuples(index=False):
-            status = save_to_notion(ledger)
-            print(f'Saved to Notion with status: {status}')
-
-def save_to_notion(ledger: Mapping[str, Any]):
-    url = 'https://api.notion.com/v1/pages'
-    NOTION_TOKEN = os.environ.get('NOTION_TOKEN')
-    DATABASE_ID = os.environ.get('DATABASE_ID')
-    _type, amount, fee = ledger
-
-    headers = {
-        "Authorization": "Bearer " + NOTION_TOKEN,
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    page = {
-        "parent": {
-            "database_id": DATABASE_ID
-        },
-        "properties": {
-            "type": {
-                "title": [{ "text": { "content": _type } }]
-            },
-            "amount": { "number": amount },
-            "fee": { "number": fee }
-        }
-    }
-
-    body_str = json.dumps(page)
-    req = urllib.request.Request(
-        method='POST',
-        url=url,
-        data=body_str.encode(),
-        headers=headers,
-    )
-    response = urllib.request.urlopen(req)
-    return response.status
 
 def save_ledger(ledger: dict):
     df = pd.DataFrame.from_dict(ledger, orient='index')
