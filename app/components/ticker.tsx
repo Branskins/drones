@@ -9,7 +9,7 @@ interface PriceData {
   volume24h: number;
 }
 
-export default function Ticker() {
+export default function Ticker({ children }: { children?: React.ReactNode }) {
   const [price, setPrice] = useState<PriceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +41,7 @@ export default function Ticker() {
 
   return (
     <div className="p-6 bg-gray-100 rounded-lg">
+      {children}
       <h2 className="text-2xl font-bold mb-4">Bitcoin Price (Kraken)</h2>
       <div className="space-y-2">
         <p className="text-lg">
