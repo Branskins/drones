@@ -1,13 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface PriceData {
-  askPrice: number;
-  bidPrice: number;
-  lastPrice: number;
-  volume24h: number;
-}
+import type { PriceData } from '@/utils/kraken';
 
 export default function Ticker({ children }: { children?: React.ReactNode }) {
   const [price, setPrice] = useState<PriceData | null>(null);
