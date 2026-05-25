@@ -1,38 +1,49 @@
 import { createClient } from '@/utils/supabase';
 
 interface LedgersProps {
-  bidPrice: number;
+  btcBidPrice: number;
+  ethBidPrice: number;
 }
 
-export default async function Ledgers({ bidPrice }: LedgersProps) {
+export default async function Ledgers({ btcBidPrice, ethBidPrice }: LedgersProps) {
   const supabase = await createClient();
-  const { data: sales } = await supabase
-    .from("sales")
+  const { data: trades } = await supabase
+    .from("trades")
     .select()
-    .eq('asset', 'XXBT');
+    .eq('asset', 'XXBT')
+    .eq('status', 'available');
 
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
         <tr>
-          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Ref ID</th>
+          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Base Ledger</th>
           <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Asset</th>
           <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>Amount</th>
+          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>Price (USD)</th>
           <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>Buy</th>
+          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>Fee (USD)</th>
           <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>P&L</th>
+          <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>Action</th>
         </tr>
       </thead>
       <tbody>
-        {sales?.map((sale) => {
-          const pnl = (sale.amount_non_zusd * bidPrice) - sale.amount_zusd;
+        {trades?.map((trade) => {
+          const bidPrice = trade.asset === 'XETH' ? ethBidPrice : btcBidPrice;
+          const pnl = (trade.volume * bidPrice) - trade.cost_usd;
           return (
-            <tr key={sale.refid}>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{sale.refid}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{sale.asset}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{sale.amount_non_zusd}</td>
-              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{sale.amount_zusd}</td>
+            <tr key={trade.base_ledger_id}>
+              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{trade.base_ledger_id}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px' }}>{trade.asset}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{trade.volume}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{trade.price_usd}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{trade.cost_usd}</td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right' }}>{trade.fee_usd}</td>
               <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'right', color: pnl >= 0 ? 'green' : 'red' }}>
                 ${pnl.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </td>
+              <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
+                <button style={{ padding: '4px 12px', cursor: 'pointer' }}>Trade</button>
               </td>
             </tr>
           );
