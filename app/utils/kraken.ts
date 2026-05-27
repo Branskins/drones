@@ -119,9 +119,5 @@ export async function addOrder(params: AddOrderParams): Promise<AddOrderResult> 
     volume: params.volume,
   };
 
-  if (params.price) {
-    body.price = params.price;
-  }
-
   return privateRequest<AddOrderResult>('/private/AddOrder', body);
 }
