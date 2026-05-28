@@ -12,7 +12,8 @@ export default async function Ledgers({ btcBidPrice, ethBidPrice }: LedgersProps
     .from("trades")
     .select()
     .or('asset.eq.XXBT, asset.eq.XETH')
-    .eq('status', 'available');
+    .eq('status', 'available')
+    .order('executed_at', { ascending: false });
 
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
