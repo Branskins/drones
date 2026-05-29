@@ -43,48 +43,8 @@ def main():
 
         print(json.dumps(ledger, indent=4))
     elif args.output == 'db':
-        ledgers = {}
-        offset = 0
-        batch_size = 50
         supabase: Client = create_client(url, key)
-
-        while True:
-            response = request(
-                method="POST",
-                path="/0/private/Ledgers",
-                body = {
-                    "ofs": offset
-                },
-                public_key=PUBLIC_KEY,
-                private_key=PRIVATE_KEY,
-                environment="https://api.kraken.com",
-            )
-
-            ledger = parse_ledger(response)
-            ledgers.update(ledger['result']['ledger'])
-
-            if len(ledger['result']['ledger']) < batch_size:
-                break
-
-            offset += batch_size
-
-            time.sleep(1)
-
-        df = pd.DataFrame.from_dict(ledgers, orient='index')
-        df.reset_index(names='ledger_id', inplace=True)
-        # df = df[df['type'].isin(['deposit', 'receive', 'spend'])]
-        df = df[['ledger_id', 'amount', 'asset', 'balance', 'fee' , 'refid', 'time', 'type']]
-        df = df.astype({'amount': float, 'balance': float, 'fee': float, 'time': int})
-        
-        try:
-            response = (
-                supabase.table('ledgers')
-                .upsert(df.to_dict(orient='records'), on_conflict='ledger_id')
-                .execute()
-            )
-            print(response)
-        except Exception as exception:
-            print(exception)
+        sync_ledgers(supabase, PUBLIC_KEY, PRIVATE_KEY)
 
     elif args.output == 'csv':
         response = request(
@@ -101,6 +61,41 @@ def main():
 
         save_ledger(ledger['result']['ledger'])
         print('Saved to CSV')
+
+def sync_ledgers(supabase: Client, public_key: str, private_key: str) -> None:
+    ledgers = {}
+    offset = 0
+    batch_size = 50
+
+    while True:
+        response = request(
+            method="POST",
+            path="/0/private/Ledgers",
+            body={"ofs": offset},
+            public_key=public_key,
+            private_key=private_key,
+            environment="https://api.kraken.com",
+        )
+        ledger = parse_ledger(response)
+        ledgers.update(ledger['result']['ledger'])
+
+        if len(ledger['result']['ledger']) < batch_size:
+            break
+
+        offset += batch_size
+        time.sleep(1)
+
+    df = pd.DataFrame.from_dict(ledgers, orient='index')
+    df.reset_index(names='ledger_id', inplace=True)
+    df = df[['ledger_id', 'amount', 'asset', 'balance', 'fee', 'refid', 'time', 'type']]
+    df = df.astype({'amount': float, 'balance': float, 'fee': float, 'time': int})
+
+    response = (
+        supabase.table('ledgers')
+        .upsert(df.to_dict(orient='records'), on_conflict='ledger_id')
+        .execute()
+    )
+    print(response)
 
 def save_ledger(ledger: dict):
     df = pd.DataFrame.from_dict(ledger, orient='index')
