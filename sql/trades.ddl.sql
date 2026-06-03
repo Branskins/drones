@@ -9,5 +9,6 @@ CREATE TABLE public.trades (
     cost_usd double precision NULL,
     fee_usd double precision NULL,
     executed_at timestamp without time zone NULL,
+    order_txid text NULL,
     CONSTRAINT trades_pkey PRIMARY KEY (base_ledger_id, quote_ledger_id)
 ) TABLESPACE pg_default;
