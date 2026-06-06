@@ -33,7 +33,7 @@ export default async function Ledgers({ btcBidPrice, ethBidPrice }: LedgersProps
       <tbody>
         {trades?.map((trade) => {
           const bidPrice = trade.asset === 'XETH' ? ethBidPrice : btcBidPrice;
-          const pnl = (trade.volume * bidPrice) - trade.cost_usd;
+          const pnl = (trade.volume * bidPrice) - trade.cost_usd - trade.fee_usd;
           const gainPct = (pnl / trade.cost_usd) * 100;
           return (
             <tr key={trade.base_ledger_id}>
