@@ -41,7 +41,7 @@ export async function markTradeAsSold(baseLedgerId: string) {
   // Mark the trade as sold in Supabase
   const { error: updateError } = await supabase
     .from('trades')
-    .update({ status: 'sold' })
+    .update({ status: 'sold', order_txid: order.txid[0] })
     .eq('base_ledger_id', baseLedgerId);
 
   if (updateError) {
