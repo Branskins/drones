@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchPriceData } from '@/utils/kraken';
+import { fetchPriceData } from '@/lib/kraken';
 
 export async function GET() {
   try {

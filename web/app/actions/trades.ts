@@ -1,7 +1,7 @@
 'use server';
 
-import { createClient } from '@/utils/supabase';
-import { addOrder } from '@/utils/kraken';
+import { createClient } from '@/lib/supabase/server';
+import { addOrder } from '@/lib/kraken';
 import { revalidatePath } from 'next/cache';
 
 export async function markTradeAsSold(baseLedgerId: string) {

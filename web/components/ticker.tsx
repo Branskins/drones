@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { TickerData } from '@/utils/kraken';
+import type { TickerData } from '@/lib/kraken';
 
 function PriceRow({ label, price }: { label: string; price: number }) {
   return (

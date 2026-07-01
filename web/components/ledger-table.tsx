@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { markTradeAsSold } from '@/app/actions/trades';
-import type { TickerData } from '@/utils/kraken';
+import type { TickerData } from '@/lib/kraken';
 
 interface Trade {
   base_ledger_id: string;

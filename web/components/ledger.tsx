@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase';
+import { createClient } from '@/lib/supabase/server';
 import Ticker from '@/components/ticker';
 import LedgerTable from '@/components/ledger-table';
 
