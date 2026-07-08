@@ -1,6 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-/** Supabase client for use in Client Components. */
+/** Supabase client for use in Client Components (login form, etc.). */
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

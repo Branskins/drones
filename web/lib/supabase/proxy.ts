@@ -18,14 +18,11 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet: CookieToSet[], headers?: Record<string, string>) {
+        setAll(cookiesToSet: CookieToSet[]) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
           response = NextResponse.next({ request });
-          if (headers) {
-            Object.entries(headers).forEach(([k, v]) => response.headers.set(k, v));
-          }
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );
