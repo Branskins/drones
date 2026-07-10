@@ -39,8 +39,19 @@ def request(method: str = "GET", path: str = "", query: dict | None = None, body
     return urllib.request.urlopen(req)
 
 
+_last_nonce = 0
+
+
 def get_nonce() -> str:
-    return str(int(time.time() * 1000))
+    # Microsecond wall clock, forced strictly increasing within the process.
+    # Kraken requires an ever-increasing nonce per API key; millisecond nonces
+    # collide when two requests land in the same ms.
+    global _last_nonce
+    nonce = time.time_ns() // 1000
+    if nonce <= _last_nonce:
+        nonce = _last_nonce + 1
+    _last_nonce = nonce
+    return str(nonce)
 
 
 def get_signature(private_key: str, data: str, nonce: str, path: str) -> str:
