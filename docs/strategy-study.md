@@ -5,102 +5,110 @@ Data: Kraken daily candles (public OHLC, 720 candles/pair — ~2 years). H1/H2 =
 
 ## XBTUSD
 
-Period: 2024-07-19 .. 2026-07-08. Price 66,709 -> 62,241 (-6.7%).
-Buy-and-hold benchmark: net $-35.35 (-7.1%), maxDD -53.1%.
+Period: 2013-10-06 .. 2026-07-08. Price 122 -> 62,241 (+50917.3%).
+Buy-and-hold benchmark: net $+250,256.96 (+50051.4%), maxDD -85.0%.
 
 | strategy | params | net$ FULL | ret% | maxDD% | sharpe | fees$ | trips | win% | util% | net$ H1 | net$ H2 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| dca_tp | intervalh=24 tp=2.0 | -15.24 | -3.0 | -34.6 | 0.09 | 57.63 | 225 | 100.0 | 83 | +184.73 | -200.86 |
-| dca_tp | intervalh=24 tp=4.0 | +10.51 | +2.1 | -34.2 | 0.19 | 33.38 | 127 | 100.0 | 90 | +216.71 | -205.87 |
-| dca_tp | intervalh=24 tp=6.0 | +4.52 | +0.9 | -35.3 | 0.17 | 22.45 | 83 | 100.0 | 93 | +231.59 | -226.96 |
-| dca_tp | intervalh=24 tp=10.0 | +1.56 | +0.3 | -36.2 | 0.17 | 13.75 | 48 | 100.0 | 96 | +237.37 | -236.26 |
-| dca_tp | intervalh=72 tp=2.0 | -53.08 | -10.6 | -33.4 | -0.12 | 41.34 | 160 | 100.0 | 58 | +117.66 | -171.20 |
-| dca_tp | intervalh=72 tp=4.0 | +18.16 | +3.6 | -31.4 | 0.20 | 31.61 | 120 | 100.0 | 71 | +183.84 | -176.10 |
-| dca_tp | intervalh=72 tp=6.0 | +30.25 | +6.0 | -32.4 | 0.25 | 23.48 | 87 | 100.0 | 81 | +223.90 | -209.22 |
-| dca_tp | intervalh=72 tp=10.0 | -0.13 | -0.0 | -36.6 | 0.15 | 13.49 | 47 | 100.0 | 90 | +233.13 | -231.56 |
-| dca_tp | intervalh=168 tp=2.0 | +10.92 | +2.2 | -13.3 | 0.15 | 25.05 | 97 | 100.0 | 26 | +51.16 | -138.24 |
-| dca_tp | intervalh=168 tp=4.0 | -10.87 | -2.2 | -24.9 | 0.04 | 21.99 | 82 | 100.0 | 46 | +101.78 | -130.91 |
-| dca_tp | intervalh=168 tp=6.0 | -29.39 | -5.9 | -33.2 | -0.01 | 16.83 | 61 | 100.0 | 62 | +145.91 | -181.14 |
-| dca_tp | intervalh=168 tp=10.0 | -8.29 | -1.7 | -36.0 | 0.10 | 12.96 | 45 | 100.0 | 77 | +206.29 | -218.07 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 | -31.36 | -6.3 | -34.9 | 0.01 | 29.81 | 77 | 100.0 | 66 | +140.45 | -179.27 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 max_dd=25 | +14.46 | +2.9 | -25.9 | 0.18 | 31.09 | 83 | 92.8 | 45 | +140.45 | -108.80 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 | -8.45 | -1.7 | -33.5 | 0.10 | 29.38 | 76 | 100.0 | 68 | +164.77 | -177.21 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 max_dd=25 | -7.00 | -1.4 | -31.1 | 0.09 | 30.47 | 83 | 91.6 | 46 | +164.77 | -107.42 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 | -36.31 | -7.3 | -35.7 | 0.01 | 22.10 | 59 | 100.0 | 72 | +144.50 | -206.90 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 max_dd=25 | +10.41 | +2.1 | -26.6 | 0.17 | 23.41 | 65 | 90.8 | 50 | +144.50 | -111.17 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | +10.89 | +2.2 | -33.3 | 0.18 | 21.51 | 57 | 100.0 | 74 | +185.39 | -205.20 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | +12.37 | +2.5 | -30.9 | 0.17 | 22.61 | 64 | 89.1 | 53 | +185.39 | -108.85 |
-| grid | step=3.0 band=25 | +55.44 | +11.1 | -5.3 | 0.77 | 12.06 | 47 | 100.0 | 5 | +38.25 | -144.31 |
-| grid | step=3.0 band=40 | +56.68 | +11.3 | -5.3 | 0.82 | 12.31 | 48 | 100.0 | 5 | +39.49 | -152.91 |
-| grid | step=4.0 band=25 | +49.08 | +9.8 | -4.2 | 0.96 | 7.57 | 29 | 100.0 | 4 | +32.83 | -107.17 |
-| grid | step=4.0 band=40 | +49.08 | +9.8 | -4.2 | 0.96 | 7.57 | 29 | 100.0 | 4 | +32.83 | -132.54 |
-| grid | step=6.0 band=25 | +32.09 | +6.4 | -2.7 | 0.91 | 3.18 | 12 | 100.0 | 2 | +21.72 | -64.62 |
-| grid | step=6.0 band=40 | +32.09 | +6.4 | -2.7 | 0.91 | 3.18 | 12 | 100.0 | 2 | +21.72 | -92.73 |
+| dca_tp | intervalh=24 tp=2.0 | +639.86 | +128.0 | -71.0 | 0.36 | 223.05 | 885 | 100.0 | 88 | +185.41 | +389.73 |
+| dca_tp | intervalh=24 tp=4.0 | +1088.45 | +217.7 | -67.6 | 0.45 | 170.83 | 670 | 100.0 | 91 | +446.45 | +637.82 |
+| dca_tp | intervalh=24 tp=6.0 | +1341.51 | +268.3 | -62.9 | 0.51 | 137.22 | 532 | 100.0 | 93 | +647.09 | +707.26 |
+| dca_tp | intervalh=24 tp=10.0 | +1649.23 | +329.9 | -57.3 | 0.59 | 100.26 | 380 | 100.0 | 95 | +886.02 | +815.47 |
+| dca_tp | intervalh=72 tp=2.0 | +514.67 | +102.9 | -70.7 | 0.34 | 184.70 | 732 | 100.0 | 72 | +184.88 | +244.69 |
+| dca_tp | intervalh=72 tp=4.0 | +732.81 | +146.6 | -71.9 | 0.38 | 122.74 | 480 | 100.0 | 80 | +265.16 | +433.06 |
+| dca_tp | intervalh=72 tp=6.0 | +1030.77 | +206.2 | -69.7 | 0.44 | 109.36 | 423 | 100.0 | 83 | +447.84 | +530.51 |
+| dca_tp | intervalh=72 tp=10.0 | +1270.36 | +254.1 | -65.3 | 0.50 | 80.19 | 303 | 100.0 | 89 | +664.31 | +620.23 |
+| dca_tp | intervalh=168 tp=2.0 | +482.39 | +96.5 | -66.4 | 0.33 | 144.10 | 572 | 100.0 | 41 | +188.84 | +170.04 |
+| dca_tp | intervalh=168 tp=4.0 | +584.79 | +117.0 | -68.8 | 0.35 | 98.18 | 383 | 100.0 | 67 | +206.37 | +310.14 |
+| dca_tp | intervalh=168 tp=6.0 | +777.57 | +155.5 | -66.6 | 0.39 | 86.10 | 332 | 100.0 | 72 | +293.60 | +393.44 |
+| dca_tp | intervalh=168 tp=10.0 | +933.32 | +186.7 | -61.8 | 0.44 | 62.47 | 235 | 100.0 | 80 | +486.49 | +517.77 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 | +556.70 | +111.3 | -71.5 | 0.34 | 120.03 | 279 | 100.0 | 74 | +287.95 | +247.46 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 max_dd=25 | -104.14 | -20.8 | -27.8 | -0.24 | 8.21 | 16 | 68.8 | 1 | -104.14 | -3.45 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 | +607.96 | +121.6 | -71.5 | 0.35 | 107.97 | 247 | 100.0 | 76 | +283.69 | +288.59 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 max_dd=25 | -104.14 | -20.8 | -27.8 | -0.24 | 8.21 | 16 | 68.8 | 1 | -104.14 | +10.44 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 | +655.06 | +131.0 | -68.8 | 0.37 | 99.04 | 236 | 100.0 | 76 | +417.08 | +234.22 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 max_dd=25 | -82.31 | -16.5 | -26.8 | -0.18 | 8.26 | 16 | 68.8 | 1 | -82.31 | +25.37 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | +742.34 | +148.5 | -68.8 | 0.38 | 84.29 | 192 | 100.0 | 79 | +405.09 | +315.57 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | -82.31 | -16.5 | -26.8 | -0.18 | 8.26 | 16 | 68.8 | 1 | -82.31 | +39.66 |
+| grid | step=3.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +35.78 |
+| grid | step=3.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +41.95 |
+| grid | step=4.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +39.74 |
+| grid | step=4.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +60.47 |
+| grid | step=6.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +19.01 |
+| grid | step=6.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +54.31 |
 
 ## ETHUSD
 
-Period: 2024-07-19 .. 2026-07-08. Price 3,505 -> 1,742 (-50.3%).
-Buy-and-hold benchmark: net $-252.52 (-50.5%), maxDD -67.6%.
+Period: 2015-08-07 .. 2026-07-08. Price 3 -> 1,742 (+57967.7%).
+Buy-and-hold benchmark: net $+288,676.98 (+57735.4%), maxDD -94.1%.
 
 | strategy | params | net$ FULL | ret% | maxDD% | sharpe | fees$ | trips | win% | util% | net$ H1 | net$ H2 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| dca_tp | intervalh=24 tp=2.0 | -164.66 | -32.9 | -50.7 | -0.13 | 36.83 | 142 | 100.0 | 90 | -29.87 | -235.14 |
-| dca_tp | intervalh=24 tp=4.0 | -151.39 | -30.3 | -52.1 | -0.09 | 21.74 | 81 | 100.0 | 94 | -32.53 | -220.87 |
-| dca_tp | intervalh=24 tp=6.0 | -153.89 | -30.8 | -53.6 | -0.09 | 14.78 | 53 | 100.0 | 95 | -39.46 | -213.44 |
-| dca_tp | intervalh=24 tp=10.0 | -131.08 | -26.2 | -54.1 | -0.03 | 10.62 | 36 | 100.0 | 97 | -38.88 | -180.71 |
-| dca_tp | intervalh=72 tp=2.0 | -124.14 | -24.8 | -45.1 | -0.23 | 39.84 | 154 | 100.0 | 65 | +80.81 | -197.21 |
-| dca_tp | intervalh=72 tp=4.0 | -103.31 | -20.7 | -46.3 | -0.06 | 24.27 | 91 | 100.0 | 79 | +28.44 | -243.06 |
-| dca_tp | intervalh=72 tp=6.0 | -104.59 | -20.9 | -46.7 | -0.06 | 18.62 | 68 | 100.0 | 84 | +29.42 | -244.54 |
-| dca_tp | intervalh=72 tp=10.0 | -82.30 | -16.5 | -48.1 | 0.03 | 12.96 | 45 | 100.0 | 90 | +22.49 | -237.46 |
-| dca_tp | intervalh=168 tp=2.0 | -37.04 | -7.4 | -22.4 | -0.19 | 24.68 | 95 | 100.0 | 27 | +36.48 | -163.46 |
-| dca_tp | intervalh=168 tp=4.0 | -26.14 | -5.2 | -30.2 | 0.03 | 23.01 | 86 | 100.0 | 48 | +52.30 | -154.99 |
-| dca_tp | intervalh=168 tp=6.0 | -12.35 | -2.5 | -33.1 | 0.12 | 21.43 | 79 | 100.0 | 62 | +80.14 | -189.86 |
-| dca_tp | intervalh=168 tp=10.0 | -94.41 | -18.9 | -45.2 | -0.04 | 11.40 | 39 | 100.0 | 77 | +57.09 | -232.49 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 | -103.23 | -20.6 | -44.2 | -0.05 | 27.62 | 59 | 100.0 | 76 | +51.67 | -217.36 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 max_dd=25 | -74.15 | -14.8 | -26.9 | -0.19 | 17.30 | 40 | 85.0 | 20 | -74.15 | -87.30 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 | -77.81 | -15.6 | -43.4 | 0.01 | 26.94 | 57 | 100.0 | 77 | +61.47 | -217.36 |
-| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 max_dd=25 | -64.23 | -12.8 | -26.4 | -0.15 | 16.83 | 39 | 84.6 | 20 | -64.23 | -87.30 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 | -134.02 | -26.8 | -48.4 | -0.12 | 19.31 | 41 | 100.0 | 79 | +7.05 | -193.72 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 max_dd=25 | -85.49 | -17.1 | -27.2 | -0.26 | 11.75 | 28 | 78.6 | 21 | -85.49 | -67.64 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | -97.49 | -19.5 | -47.7 | -0.02 | 17.90 | 37 | 100.0 | 80 | +16.28 | -193.72 |
-| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | -76.26 | -15.2 | -26.8 | -0.20 | 10.26 | 24 | 75.0 | 22 | -76.26 | -67.64 |
-| grid | step=3.0 band=25 | -42.40 | -8.5 | -37.4 | 0.09 | 30.76 | 118 | 100.0 | 59 | +68.50 | -110.13 |
-| grid | step=3.0 band=40 | -30.28 | -6.1 | -39.3 | 0.14 | 36.66 | 141 | 100.0 | 64 | +96.88 | -113.56 |
-| grid | step=4.0 band=25 | -12.64 | -2.5 | -28.8 | 0.11 | 20.05 | 76 | 100.0 | 45 | +67.17 | -74.56 |
-| grid | step=4.0 band=40 | +31.50 | +6.3 | -36.7 | 0.27 | 33.05 | 126 | 100.0 | 57 | +148.37 | -64.90 |
-| grid | step=6.0 band=25 | -4.62 | -0.9 | -18.3 | 0.06 | 7.89 | 29 | 100.0 | 27 | +37.31 | -51.05 |
-| grid | step=6.0 band=40 | +69.27 | +13.8 | -30.0 | 0.37 | 20.11 | 75 | 100.0 | 42 | +143.21 | -31.91 |
+| dca_tp | intervalh=24 tp=2.0 | +455.69 | +91.1 | -72.2 | 0.35 | 193.47 | 767 | 100.0 | 89 | +454.12 | -12.80 |
+| dca_tp | intervalh=24 tp=4.0 | +913.18 | +182.6 | -71.4 | 0.44 | 157.67 | 618 | 100.0 | 90 | +795.55 | +91.33 |
+| dca_tp | intervalh=24 tp=6.0 | +1236.18 | +247.2 | -70.6 | 0.49 | 134.15 | 520 | 100.0 | 92 | +1050.93 | +146.34 |
+| dca_tp | intervalh=24 tp=10.0 | +1743.26 | +348.6 | -68.6 | 0.56 | 109.12 | 414 | 100.0 | 94 | +1433.07 | +269.29 |
+| dca_tp | intervalh=72 tp=2.0 | +203.41 | +40.7 | -63.5 | 0.27 | 122.54 | 484 | 100.0 | 77 | +299.76 | -96.34 |
+| dca_tp | intervalh=72 tp=4.0 | +589.51 | +117.9 | -65.0 | 0.37 | 112.61 | 440 | 100.0 | 80 | +524.72 | -15.66 |
+| dca_tp | intervalh=72 tp=6.0 | +822.71 | +164.5 | -64.0 | 0.43 | 98.37 | 380 | 100.0 | 82 | +765.26 | +48.50 |
+| dca_tp | intervalh=72 tp=10.0 | +1275.01 | +255.0 | -62.9 | 0.52 | 84.36 | 319 | 100.0 | 86 | +1136.79 | +128.59 |
+| dca_tp | intervalh=168 tp=2.0 | +207.76 | +41.5 | -66.2 | 0.26 | 104.25 | 411 | 100.0 | 59 | +177.67 | +125.07 |
+| dca_tp | intervalh=168 tp=4.0 | +431.18 | +86.2 | -53.6 | 0.34 | 81.73 | 318 | 100.0 | 65 | +338.13 | +135.39 |
+| dca_tp | intervalh=168 tp=6.0 | +574.78 | +115.0 | -51.0 | 0.40 | 70.76 | 272 | 100.0 | 69 | +459.85 | +89.41 |
+| dca_tp | intervalh=168 tp=10.0 | +749.45 | +149.9 | -58.4 | 0.43 | 56.22 | 211 | 100.0 | 76 | +729.54 | +34.50 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 | +443.25 | +88.7 | -68.2 | 0.34 | 104.48 | 209 | 100.0 | 75 | +384.17 | +76.94 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=45 max_dd=25 | -136.72 | -27.3 | -31.7 | -0.34 | 3.34 | 11 | 36.4 | 0 | -136.72 | +26.79 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 | +509.68 | +101.9 | -68.2 | 0.35 | 101.85 | 205 | 100.0 | 76 | +430.58 | +96.97 |
+| dca_dip | intervalh=72 tp=4.0 smad=30 max_aged=100000 max_dd=25 | -136.72 | -27.3 | -31.7 | -0.34 | 3.34 | 11 | 36.4 | 0 | -136.72 | +30.26 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 | +479.24 | +95.8 | -67.4 | 0.35 | 78.63 | 159 | 100.0 | 78 | +512.93 | -6.89 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=45 max_dd=25 | -132.75 | -26.6 | -30.9 | -0.33 | 3.35 | 11 | 36.4 | 0 | -132.75 | -43.27 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | +592.71 | +118.5 | -67.4 | 0.38 | 77.20 | 155 | 100.0 | 79 | +571.44 | +48.07 |
+| dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | -132.75 | -26.6 | -30.9 | -0.33 | 3.35 | 11 | 36.4 | 0 | -132.75 | -43.27 |
+| grid | step=3.0 band=25 | +40.72 | +8.1 | -74.8 | 0.21 | 8.29 | 33 | 100.0 | 4 | +40.72 | +140.67 |
+| grid | step=3.0 band=40 | +48.12 | +9.6 | -82.8 | 0.25 | 9.80 | 39 | 100.0 | 4 | +48.12 | +148.07 |
+| grid | step=4.0 band=25 | +44.92 | +9.0 | -58.0 | 0.16 | 6.56 | 26 | 100.0 | 3 | +44.92 | +141.67 |
+| grid | step=4.0 band=40 | +63.93 | +12.8 | -81.4 | 0.25 | 9.34 | 37 | 100.0 | 4 | +63.93 | +153.77 |
+| grid | step=6.0 band=25 | +32.58 | +6.5 | -33.2 | 0.11 | 3.06 | 12 | 100.0 | 2 | +32.58 | +103.18 |
+| grid | step=6.0 band=40 | +67.88 | +13.6 | -63.5 | 0.19 | 6.37 | 25 | 100.0 | 3 | +67.88 | +130.34 |
 
-## Findings
+## Findings (full-history run, 2026-07-10)
 
-1. **Context**: the 2-year window is bearish — BTC −6.7% (B&H net −$35, maxDD −53%),
-   ETH −50.3% (B&H net −$253, maxDD −68%). A strategy "wins" here by protecting capital
-   while still harvesting oscillation.
-2. **Grid is the standout on BTC**: step 3–4% nets +$49..+$57 (≈+10–11%) with **max
-   drawdown −4..−5%** vs −31..−37% for every DCA variant and −53% for buy-and-hold.
-   Small caveat: its low drawdown partly reflects low utilization (rungs sit below
-   price much of the time) — it risks less, so it loses less.
-3. **The 100% win rate on every dca_tp row is the pathology, not a virtue**: take-profit-only
-   strategies realize every winner and warehouse every loser as an open lot. Net P&L
-   (which marks open lots to market) shows the truth — e.g. ETH dca_tp 24h: 100% win
-   rate, −$151 net. This is exactly what happened to the real account.
-4. **H2 (the bear leg) is where strategies differ**: dca_dip's max_dd=25 portfolio stop
-   roughly halves H2 losses on BTC (−108 vs −177) and ETH (−87 vs −217) at the cost of
-   locking in losses when it triggers. The trend-filter/dip-scaling alone (without the
-   stop) did NOT help materially vs plain DCA on this data.
-5. **ETH was hostile to everything**; only wide grids (step 6%, band 40%: +$69) stayed
-   positive. Against a −50% market that is a strong result, but it's one regime.
+Dataset now spans 2013–2026 (BTC) / 2015–2026 (ETH) after merging Kraken's OHLCVT
+archive (`python -m backtest.merge_historical`). These results supersede the earlier
+2-year study — and reverse parts of it:
 
-## Recommendation
+1. **The static grid's single anchor is fatal over long horizons.** BTC grid: **zero
+   trades in 12 years** (anchored at $122 in Oct 2013; price left the band upward within
+   weeks and never came back). ETH grid earned its entire +$40..68 in 2015–16, then sat
+   idle for a decade. The 2-year study's "grid wins" verdict was conditional on a fresh
+   anchor in a ranging market — real deployments must **recenter the band** when price
+   walks out (the mitigation already named in the plan, now empirically mandatory).
+   The H2 columns (fresh mid-period anchor) show what a recentered grid could earn.
+2. **dca_tp is the robust long-horizon strategy of the three as implemented.** BTC:
+   +$515..$1,649 net on a $500 budget across every param set, positive in both halves;
+   ETH similar. Higher targets did better (tp 10% > 6% > 4% — lots ride the uptrend
+   longer), the opposite of the 2-year ordering. Its 2024–26 losses in the previous
+   study were a window artifact: over any span containing a bull leg it recovers. The
+   cost is deep equity drawdowns (−57..−72%) — the warehousing pathology is still real,
+   it just eventually resolves when the market makes new highs.
+3. **The dca_dip drawdown stop (halt-forever) is broken over long windows**: it triggers
+   in the first bear market, liquidates, never re-enters, and guarantees a permanent
+   −$80..−$137. It needs a re-entry rule or removal. Dip-scaling without the stop merely
+   matches plain dca_tp — it has not earned its complexity.
+4. **Buy-and-hold dwarfs everything** (+$250k BTC / +$289k ETH from $500) because the
+   assets did ~500x. That is hindsight, not a strategy — but it is a reminder that any
+   take-profit design caps upside by construction and wins only on risk, not return.
 
-- **Paper phase (Phase 3)**: run **grid (step 4%, band 25%) on BTC** as the primary
-  candidate and **dca_tp (72h, tp 4–6%) on BTC** as the control. Hold off on ETH with
-  real money until the strategy survives a longer backtest window.
-- **Before live**: extend the dataset with Kraken's downloadable OHLCVT history
-  (2021–2024 covers a full bull+bear cycle — see docs/human-actions.md) and re-run
-  `python -m backtest.study`. The current 720-candle window is the binding limitation.
-- Parameters were chosen from plateaus (grid 3–4% similar, dca_tp 4–6% similar), not
-  single peaks, per the plan's overfitting rule.
+## Recommendation (updated)
+
+- **Keep the current paper run**: grid on BTC, freshly anchored — exactly the conditions
+  under which grid performs. It is the right live experiment for the next weeks.
+- **Before live (Phase 5), add grid band recentering** (rebuild rungs around price after
+  k candles outside the band); without it the strategy has a shelf life of one trend.
+- **Promote dca_tp (24–72h cadence, tp 6–10%) to co-primary candidate** and accept its
+  drawdown profile consciously — it is the only variant that made money across every
+  regime slice of 12 years.
+- Drop or redesign the dca_dip portfolio stop before it is ever enabled.
 
 *(Regenerating this file: `python -m backtest.study` rewrites the tables above and
 drops this section — re-add or update it after each run.)*
