@@ -55,16 +55,35 @@ def main():
         save_trade(trade['result']['trades'])
         print('Saved to CSV')
 
+SYNC_OVERLAP_SECONDS = 86400  # re-fetch a day of overlap; upsert dedupes
+
+
+def _last_synced_time(supabase: Client) -> float | None:
+    rows = (
+        supabase.table('trades_history')
+        .select('time')
+        .order('time', desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
+    return rows[0]['time'] if rows else None
+
+
 def sync_trades(supabase: Client, public_key: str, private_key: str) -> None:
     trades = {}
     offset = 0
     batch_size = 50
+    since = _last_synced_time(supabase)
 
     while True:
+        body = {"ofs": offset}
+        if since is not None:
+            body["start"] = since - SYNC_OVERLAP_SECONDS
         response = request(
             method="POST",
             path="/0/private/TradesHistory",
-            body={"ofs": offset},
+            body=body,
             public_key=public_key,
             private_key=private_key,
             environment="https://api.kraken.com",
@@ -77,6 +96,9 @@ def sync_trades(supabase: Client, public_key: str, private_key: str) -> None:
 
         offset += batch_size
         time.sleep(1)
+
+    if not trades:
+        return
 
     df = pd.DataFrame.from_dict(trades, orient='index')
     df = df.rename(columns={'ordertxid': 'order_txid', 'trade_id': '_trade_id'})

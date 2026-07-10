@@ -55,16 +55,35 @@ def main():
         save_ledger(ledger['result']['ledger'])
         print('Saved to CSV')
 
+SYNC_OVERLAP_SECONDS = 86400  # re-fetch a day of overlap; upsert dedupes
+
+
+def _last_synced_time(supabase: Client) -> int | None:
+    rows = (
+        supabase.table('ledgers')
+        .select('time')
+        .order('time', desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
+    return rows[0]['time'] if rows else None
+
+
 def sync_ledgers(supabase: Client, public_key: str, private_key: str) -> None:
     ledgers = {}
     offset = 0
     batch_size = 50
+    since = _last_synced_time(supabase)
 
     while True:
+        body = {"ofs": offset}
+        if since is not None:
+            body["start"] = since - SYNC_OVERLAP_SECONDS
         response = request(
             method="POST",
             path="/0/private/Ledgers",
-            body={"ofs": offset},
+            body=body,
             public_key=public_key,
             private_key=private_key,
             environment="https://api.kraken.com",
@@ -77,6 +96,9 @@ def sync_ledgers(supabase: Client, public_key: str, private_key: str) -> None:
 
         offset += batch_size
         time.sleep(1)
+
+    if not ledgers:
+        return
 
     df = pd.DataFrame.from_dict(ledgers, orient='index')
     df.reset_index(names='ledger_id', inplace=True)
