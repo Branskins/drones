@@ -2,3 +2,5 @@
 .venv
 __pycache__
 *.csv
+!backtest/data/XBTUSD_1440.csv
+!backtest/data/ETHUSD_1440.csv
