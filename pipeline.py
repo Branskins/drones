@@ -31,6 +31,9 @@ def setup_db():
     with conn.cursor() as cur:
         _create_function(cur, "sync_trades", "sql/trades.sql")
         _create_function(cur, "sync_realized_pnl", "sql/realized_pnl.sql")
+        with open("sql/bot.ddl.sql") as f:
+            cur.execute(f.read())
+        print("setup_db: bot tables applied (sql/bot.ddl.sql)")
     conn.close()
     print("setup_db complete")
 
