@@ -172,18 +172,24 @@ class DcaDip(Strategy):
 
 
 class Grid(Strategy):
-    """S3 — static grid: resting limit buys at rungs below the anchor price;
-    each fill immediately rests its paired sell one step up."""
+    """S3 — grid: resting limit buys at rungs below the anchor price; each
+    fill immediately rests its paired sell one step up. When price walks up
+    and away from the ladder by `recenter_pct`, the unfilled rungs are torn
+    down and rebuilt around the current price (filled lots and their sells
+    are never touched) — without this the grid goes dormant after one trend
+    (the 12-year backtest's BTC grid made zero trades in 12 years)."""
     name = 'grid'
 
     def __init__(self, params: dict, fees: FeeModel | None = None):
         super().__init__(params, fees)
         self._initialized = False
 
-    def _rung_prices(self, anchor: float) -> list[float]:
+    def _rung_prices(self, anchor: float, max_notional: float | None = None) -> list[float]:
         step = self.params.get('step_pct', 4.0) / 100
         band = self.params.get('band_pct', 25) / 100
-        max_rungs = int(self.params['budget_usd'] // self.params['batch_usd'])
+        batch = self.params['batch_usd']
+        cap = self.params['budget_usd'] if max_notional is None else max_notional
+        max_rungs = int(cap // batch)
         prices = []
         price = anchor
         while len(prices) < max_rungs:
@@ -193,13 +199,32 @@ class Grid(Strategy):
             prices.append(price)
         return prices
 
-    def on_candle(self, candle, portfolio, broker) -> list[Intent]:
-        if self._initialized:
-            return []
-        self._initialized = True
+    def _ladder(self, anchor: float, max_notional: float | None = None) -> list[Intent]:
         batch = self.params['batch_usd']
         return [self._entry_intent(batch, rung, f'{self.name}:rung', ttl=0)
-                for rung in self._rung_prices(candle.close)]
+                for rung in self._rung_prices(anchor, max_notional)]
+
+    def on_candle(self, candle, portfolio, broker) -> list[Intent]:
+        if not self._initialized:
+            self._initialized = True
+            return self._ladder(candle.close)
+
+        recenter_pct = self.params.get('recenter_pct')
+        if not recenter_pct:
+            return []
+        rung_buys = [o for o in broker.open_orders() if o.side == 'buy']
+        if not rung_buys:
+            return []  # every rung is inventory; sells above will re-arm them
+        step = self.params.get('step_pct', 4.0) / 100
+        implied_anchor = max(o.price for o in rung_buys) / (1 - step)
+        if candle.close <= implied_anchor * (1 + recenter_pct / 100):
+            return []
+
+        # Price left the band upward: rebuild the unfilled rungs up here.
+        for order in rung_buys:
+            broker.cancel(order.id)
+        available = self._available_usd(portfolio, broker)
+        return self._ladder(candle.close, max_notional=available)
 
     def on_buy_fill(self, lot: Lot, candle: Candle) -> list[Intent]:
         step = self.params.get('step_pct', 4.0) / 100

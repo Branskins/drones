@@ -34,8 +34,9 @@ SWEEPS = {
             [4.0, 6.0], [45, 100000], [None, 25])
     ],
     'grid': [
-        {'step_pct': step, 'band_pct': band}
-        for step, band in itertools.product([3.0, 4.0, 6.0], [25, 40])
+        {'step_pct': step, 'band_pct': band, 'recenter_pct': recenter}
+        for step, band, recenter in itertools.product(
+            [3.0, 4.0, 6.0], [25, 40], [None, 10])
     ],
 }
 

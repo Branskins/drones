@@ -121,6 +121,23 @@ def main() -> int:
     ok &= check('grid round trip is net positive after fees',
                 p.realized_cum_usd > 0, f'(realized={p.realized_cum_usd:.2f})')
 
+    # 6. Grid recentering: price rallies away from the ladder -> unfilled
+    #    rungs are rebuilt around the new price and can fill up there.
+    cs = candles([(100, 100, 100, 100),   # init: rungs at 95 and 90.25
+                  (111, 112, 108, 111),   # no fills; close 111 > 110 -> recenter
+                  (111, 111, 104, 106)])  # new top rung 105.45 fills
+    p = Portfolio(budget_usd=100)
+    strat = Grid({'budget_usd': 100, 'batch_usd': 50, 'step_pct': 5.0,
+                  'band_pct': 10.0, 'min_net_pct': 0.5, 'recenter_pct': 10.0}, FEES)
+    e = Engine(cs, strat, p, FEES).run()
+    buys = [f for f in e.fills if f.side == 'buy']
+    open_buy_prices = sorted(o.price for o in e.open_orders if o.side == 'buy')
+    ok &= check('grid recenters after price leaves the band',
+                len(buys) == 1 and abs(buys[0].price - 111 * 0.95) < 0.01
+                and all(pr > 96 for pr in open_buy_prices),
+                f'(fill={[round(b.price, 2) for b in buys]}, '
+                f'resting_buys={[round(pr, 2) for pr in open_buy_prices]})')
+
     print('\nSELFTEST ' + ('PASSED' if ok else 'FAILED'))
     return 0 if ok else 1
 

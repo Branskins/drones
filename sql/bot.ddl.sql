@@ -108,5 +108,5 @@ INSERT INTO public.strategy_config (key, value) VALUES
 ('legacy_exit_window', '{"max_resting_orders": 20, "max_distance_pct": 15}'),
 ('dca_tp', '{"interval_hours": 72, "tp_pct": 4.0}'),
 ('dca_dip', '{"interval_hours": 72, "tp_pct": 4.0, "sma_days": 30, "tiers": [[0.05, 0], [0.0, 1], [-0.05, 2], [-0.15, 3]], "max_age_days": 45}'),
-('grid', '{"band_pct": 25, "step_pct": 4.0}')
+('grid', '{"band_pct": 25, "step_pct": 4.0, "recenter_pct": 10}')
 ON CONFLICT (key) DO NOTHING;
