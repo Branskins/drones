@@ -43,18 +43,29 @@ nothing in the paper phase is blocked — items 1–4 unlock alerts + CI, items
    - GitHub Actions workflow env: add `ALLOW_LIVE: "1"`.
    Acceptance criteria before doing this (from the plan): ≥2 weeks of unattended
    paper running with zero unreconciled orders, paper equity tracking backtest
-   expectation. **Also required first**: implement live reconciliation
-   (`bot/run.py` exits with `live_reconcile_not_implemented` if mode=live) — the
-   OwnTrades/QueryOrders polling loop was deliberately left for Phase 5 so no
-   half-tested code path can touch real orders.
+   expectation.
+   ~~Also required first: implement live reconciliation~~ **Done (2026-07-14)**:
+   `bot/executor.py:reconcile_live` tracks live orders via QueryOrders, recovers
+   crashed `pending` orders by userref lookup, and handles partial fills
+   (partial *sells* canceled mid-fill raise an error event for manual lot
+   adjustment). With `mode=live` and the gate closed, the bot reconciles and
+   snapshots but skips order creation (`live_gate_closed_skip_execution` warn).
+   Suggested rollout: set `mode=live` with `live_validate_only=true` for a few
+   days first — AddOrder is exercised end-to-end (auth, formatting, funds
+   checks) without a single order executing.
 
 ## Legacy lots (Phase 6)
 
 8. The 78 pre-bot lots are imported into `lots` (strategy `legacy`) with +1% net
    targets (`python -m bot.legacy_import` — re-runnable, idempotent, prints the
-   rolling-window report). Placing their resting GTC limit sells is live trading:
-   it activates together with the Phase 5 gate. As of 2026-07-09, 9 lots sit inside
-   the 15% placement window (nearest: BTC target $64,732, +3.1% from market).
+   rolling-window report). As of 2026-07-09, 9 lots sit inside the 15% placement
+   window (nearest: BTC target $64,732, +3.1% from market).
+   **Implemented (2026-07-14)**: `bot/legacy.py` runs every live cycle and
+   maintains the rolling window automatically — resting GTC post-only sells for
+   the `max_resting_orders` lots nearest their targets (within
+   `max_distance_pct`), canceling sells that drift out of the window. It
+   activates only when the Phase 5 gate is open AND `live_validate_only` is
+   false; no separate step needed.
 
 ## Open decisions
 
