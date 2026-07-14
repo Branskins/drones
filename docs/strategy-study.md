@@ -31,11 +31,17 @@ Buy-and-hold benchmark: net $+250,256.96 (+50051.4%), maxDD -85.0%.
 | dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | +742.34 | +148.5 | -68.8 | 0.38 | 84.29 | 192 | 100.0 | 79 | +405.09 | +315.57 |
 | dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | -82.31 | -16.5 | -26.8 | -0.18 | 8.26 | 16 | 68.8 | 1 | -82.31 | +39.66 |
 | grid | step=3.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +35.78 |
+| grid | step=3.0 band=25 recenter=10 | +677.21 | +135.4 | -64.2 | 0.37 | 176.48 | 698 | 100.0 | 80 | +141.17 | +383.54 |
 | grid | step=3.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +41.95 |
+| grid | step=3.0 band=40 recenter=10 | +888.70 | +177.7 | -69.9 | 0.40 | 238.14 | 940 | 100.0 | 112 | +119.15 | +400.07 |
 | grid | step=4.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +39.74 |
+| grid | step=4.0 band=25 recenter=10 | +617.92 | +123.6 | -49.6 | 0.40 | 125.20 | 490 | 100.0 | 63 | +213.27 | +301.75 |
 | grid | step=4.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +60.47 |
+| grid | step=4.0 band=40 recenter=10 | +967.38 | +193.5 | -63.8 | 0.42 | 183.13 | 717 | 100.0 | 104 | +244.92 | +469.80 |
 | grid | step=6.0 band=25 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +19.01 |
+| grid | step=6.0 band=25 recenter=10 | +473.38 | +94.7 | -29.1 | 0.47 | 57.98 | 224 | 100.0 | 37 | +156.43 | +250.72 |
 | grid | step=6.0 band=40 | +0.00 | +0.0 | 0.0 | 0.00 | 0.00 | 0 | - | 0 | +0.00 | +54.31 |
+| grid | step=6.0 band=40 recenter=10 | +899.93 | +180.0 | -68.3 | 0.41 | 101.81 | 394 | 100.0 | 80 | +326.10 | +460.04 |
 
 ## ETHUSD
 
@@ -65,50 +71,47 @@ Buy-and-hold benchmark: net $+288,676.98 (+57735.4%), maxDD -94.1%.
 | dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 | +592.71 | +118.5 | -67.4 | 0.38 | 77.20 | 155 | 100.0 | 79 | +571.44 | +48.07 |
 | dca_dip | intervalh=72 tp=6.0 smad=30 max_aged=100000 max_dd=25 | -132.75 | -26.6 | -30.9 | -0.33 | 3.35 | 11 | 36.4 | 0 | -132.75 | -43.27 |
 | grid | step=3.0 band=25 | +40.72 | +8.1 | -74.8 | 0.21 | 8.29 | 33 | 100.0 | 4 | +40.72 | +140.67 |
+| grid | step=3.0 band=25 recenter=10 | +797.46 | +159.5 | -74.8 | 0.43 | 251.58 | 993 | 100.0 | 91 | +738.77 | +12.69 |
 | grid | step=3.0 band=40 | +48.12 | +9.6 | -82.8 | 0.25 | 9.80 | 39 | 100.0 | 4 | +48.12 | +148.07 |
+| grid | step=3.0 band=40 recenter=10 | +1317.17 | +263.4 | -83.0 | 0.53 | 414.24 | 1634 | 100.0 | 183 | +969.51 | +61.88 |
 | grid | step=4.0 band=25 | +44.92 | +9.0 | -58.0 | 0.16 | 6.56 | 26 | 100.0 | 3 | +44.92 | +141.67 |
+| grid | step=4.0 band=25 recenter=10 | +887.29 | +177.5 | -58.0 | 0.45 | 178.59 | 701 | 100.0 | 69 | +777.60 | +94.27 |
 | grid | step=4.0 band=40 | +63.93 | +12.8 | -81.4 | 0.25 | 9.34 | 37 | 100.0 | 4 | +63.93 | +153.77 |
+| grid | step=4.0 band=40 recenter=10 | +1727.60 | +345.5 | -81.4 | 0.53 | 313.53 | 1233 | 100.0 | 136 | +1264.82 | +407.62 |
 | grid | step=6.0 band=25 | +32.58 | +6.5 | -33.2 | 0.11 | 3.06 | 12 | 100.0 | 2 | +32.58 | +103.18 |
+| grid | step=6.0 band=25 recenter=10 | +674.11 | +134.8 | -33.2 | 0.51 | 79.27 | 308 | 100.0 | 46 | +521.61 | +139.19 |
 | grid | step=6.0 band=40 | +67.88 | +13.6 | -63.5 | 0.19 | 6.37 | 25 | 100.0 | 3 | +67.88 | +130.34 |
+| grid | step=6.0 band=40 recenter=10 | +1800.37 | +360.1 | -63.5 | 0.56 | 203.01 | 789 | 100.0 | 104 | +1436.68 | +350.38 |
 
-## Findings (full-history run, 2026-07-10)
+## Findings (full history + grid recentering, 2026-07-14)
 
-Dataset now spans 2013–2026 (BTC) / 2015–2026 (ETH) after merging Kraken's OHLCVT
-archive (`python -m backtest.merge_historical`). These results supersede the earlier
-2-year study — and reverse parts of it:
+Grid rows now come in pairs: static (`recenter=None`) vs recentering (`recenter=10`,
+i.e. rebuild unfilled rungs around price when it closes >10% above the ladder's anchor).
 
-1. **The static grid's single anchor is fatal over long horizons.** BTC grid: **zero
-   trades in 12 years** (anchored at $122 in Oct 2013; price left the band upward within
-   weeks and never came back). ETH grid earned its entire +$40..68 in 2015–16, then sat
-   idle for a decade. The 2-year study's "grid wins" verdict was conditional on a fresh
-   anchor in a ranging market — real deployments must **recenter the band** when price
-   walks out (the mitigation already named in the plan, now empirically mandatory).
-   The H2 columns (fresh mid-period anchor) show what a recentered grid could earn.
-2. **dca_tp is the robust long-horizon strategy of the three as implemented.** BTC:
-   +$515..$1,649 net on a $500 budget across every param set, positive in both halves;
-   ETH similar. Higher targets did better (tp 10% > 6% > 4% — lots ride the uptrend
-   longer), the opposite of the 2-year ordering. Its 2024–26 losses in the previous
-   study were a window artifact: over any span containing a bull leg it recovers. The
-   cost is deep equity drawdowns (−57..−72%) — the warehousing pathology is still real,
-   it just eventually resolves when the market makes new highs.
-3. **The dca_dip drawdown stop (halt-forever) is broken over long windows**: it triggers
-   in the first bear market, liquidates, never re-enters, and guarantees a permanent
-   −$80..−$137. It needs a re-entry rule or removal. Dip-scaling without the stop merely
-   matches plain dca_tp — it has not earned its complexity.
-4. **Buy-and-hold dwarfs everything** (+$250k BTC / +$289k ETH from $500) because the
-   assets did ~500x. That is hindsight, not a strategy — but it is a reminder that any
-   take-profit design caps upside by construction and wins only on risk, not return.
+1. **Recentering fixes the grid's dormancy** — the flaw the first 12-year run exposed.
+   BTC: static grid made 0 trades in 12 years; recentered nets **+$473..+$967** across
+   all step/band combos. ETH: +$33..68 static becomes **+$674..+$1,800** recentered.
+2. **The cost is trend-following risk.** A recentered grid keeps chasing price upward,
+   so crashes now catch real inventory: drawdowns rise from near-zero (because the
+   static grid held nothing) to −29..−83%. Tighter bands with wider steps stay calmer:
+   BTC step 6 / band 25 / recenter 10 → **+$473 with −29% maxDD**, the best
+   risk-adjusted BTC row in the study (dca_tp needs −57..−72% dd for its +$515..1,649).
+3. **Wide-band recentered grids are the top absolute earners** (BTC step 4 / band 40:
+   +$967, −64% dd; ETH step 6 / band 40: +$1,800, −63% dd) — essentially DCA-like
+   drawdowns with better harvesting.
+4. dca_tp conclusions from the previous run stand unchanged; the dca_dip halt-forever
+   stop remains broken and should not be enabled.
 
-## Recommendation (updated)
+## Recommendation (updated 2026-07-14)
 
-- **Keep the current paper run**: grid on BTC, freshly anchored — exactly the conditions
-  under which grid performs. It is the right live experiment for the next weeks.
-- **Before live (Phase 5), add grid band recentering** (rebuild rungs around price after
-  k candles outside the band); without it the strategy has a shelf life of one trend.
-- **Promote dca_tp (24–72h cadence, tp 6–10%) to co-primary candidate** and accept its
-  drawdown profile consciously — it is the only variant that made money across every
-  regime slice of 12 years.
-- Drop or redesign the dca_dip portfolio stop before it is ever enabled.
+- **Primary: grid with recentering** — now validated over 12 years, not just 2. The
+  live paper config has been updated to `{step 4, band 25, recenter 10}` (+$618, −49.6%
+  dd on BTC full-history). For a calmer profile, `{step 6, band 25, recenter 10}`
+  (+$473, −29% dd) is the defensible conservative alternative.
+- **Control: dca_tp (72h, tp 6%)** — unchanged.
+- Phase 5 acceptance criteria unchanged: ≥2 weeks unattended paper, zero unreconciled
+  orders, equity tracking expectation — now measurable since live reconciliation is
+  implemented.
 
 *(Regenerating this file: `python -m backtest.study` rewrites the tables above and
 drops this section — re-add or update it after each run.)*
