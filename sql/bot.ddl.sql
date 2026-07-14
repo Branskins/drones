@@ -94,6 +94,8 @@ CREATE INDEX IF NOT EXISTS bot_events_ts_idx ON public.bot_events (ts DESC);
 INSERT INTO public.strategy_config (key, value) VALUES
 ('mode', '"off"'),
 ('kill_switch', 'false'),
+('confirm_live', 'false'),
+('live_validate_only', 'true'),
 ('active_strategy', '"dca_tp"'),
 ('budget_usd', '500'),
 ('batch_usd', '50'),

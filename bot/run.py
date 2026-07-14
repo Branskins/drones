@@ -5,14 +5,20 @@
 Each run: refresh data -> reconcile fills -> guardrails -> strategy decision
 -> execute -> snapshot. Mode comes from strategy_config ('off' | 'paper' |
 'live'); paper mode never touches Kraken's private API.
+
+Live mode: reconciliation (read-only private calls) always runs, but new
+orders are only created while the double gate is open (env ALLOW_LIVE=1 AND
+config confirm_live=true), and AddOrder carries validate=true until
+live_validate_only is set false. Legacy lot exits (bot/legacy.py) activate
+with the same gate.
 """
 
 import sys
 import traceback
 from datetime import datetime, timedelta, timezone
 
-from bot import data, db, executor, monitor, risk, ticker
-from bot.models import Candle, FeeModel
+from bot import data, db, executor, legacy, monitor, risk, ticker
+from bot.models import Candle, FeeModel, Lot
 from bot.strategies import REGISTRY
 
 
@@ -48,6 +54,37 @@ def cancel_stale_entries(sb, broker, config: dict) -> None:
             broker.cancel(order.id)
             db.log_event(sb, 'info', 'stale_entry_canceled',
                          {'order_id': order.id, 'price': order.price})
+
+
+def process_fills(sb, fills, strategy, candle, *, mode: str, name: str,
+                  pair: str, config: dict) -> None:
+    """Run the strategy's fill hooks (rest the paired sell / re-arm rungs)."""
+    for fill in fills:
+        db.log_event(sb, 'info', f'{mode}_fill', {
+            'side': fill['order']['side'], 'price': fill['price'],
+            'volume': float(fill['order']['volume']),
+            'reason': fill['order'].get('reason')})
+        side = fill['order']['side']
+        follow_ups = []
+        if side == 'buy' and fill['lot'] is not None:
+            portfolio = executor.load_portfolio(
+                sb, mode, name, float(config.get('budget_usd', 500)))
+            lot = next((l for l in portfolio.lots
+                        if l.id == fill['lot']['id']), None)
+            if lot is not None:
+                follow_ups = strategy.on_buy_fill(lot, candle) or []
+        elif side == 'sell' and fill['lot'] is not None:
+            row = sb.table('lots').select('*').eq('id', fill['lot']['id']) \
+                .execute().data[0]
+            lot_obj = Lot(id=row['id'], strategy=name,
+                          volume=float(row['volume']),
+                          cost_usd=float(row['cost_usd']),
+                          fee_usd=float(row['fee_usd']),
+                          opened_at=datetime.fromisoformat(row['opened_at']),
+                          state='closed')
+            follow_ups = strategy.on_sell_fill(lot_obj, candle) or []
+        executor.execute_intents(sb, follow_ups, mode=mode, strategy=name,
+                                 pair=pair, config=config)
 
 
 def cycle() -> int:
@@ -89,49 +126,32 @@ def cycle() -> int:
 
     hydrate_strategy(sb, strategy, mode=mode, candles=candles, config=params)
 
-    # 2. Reconcile fills from the previous cycle, then run fill hooks
-    #    (sets lot targets / rests the paired sell / re-arms grid rungs).
+    # 2. Reconcile fills from the previous cycle, then run fill hooks.
     if mode == 'paper':
         fills = executor.reconcile_paper(sb, strategy=name, pair=pair,
                                          ticker=tick, fees=fees)
-        for fill in fills:
-            db.log_event(sb, 'info', 'paper_fill', {
-                'side': fill['order']['side'], 'price': fill['price'],
-                'volume': float(fill['order']['volume']),
-                'reason': fill['order'].get('reason')})
-            portfolio = executor.load_portfolio(sb, mode, name, params['budget_usd'])
-            lot = next((l for l in portfolio.lots
-                        if fill['lot'] and l.id == fill['lot']['id']), None)
-            if fill['order']['side'] == 'buy' and lot is not None:
-                follow_ups = strategy.on_buy_fill(lot, decision_candle) or []
-            elif fill['order']['side'] == 'sell':
-                closed = fill['lot']
-                follow_ups = []
-                if closed is not None:
-                    from bot.models import Lot
-                    row = sb.table('lots').select('*').eq('id', closed['id']) \
-                        .execute().data[0]
-                    lot_obj = Lot(id=row['id'], strategy=name,
-                                  volume=float(row['volume']),
-                                  cost_usd=float(row['cost_usd']),
-                                  fee_usd=float(row['fee_usd']),
-                                  opened_at=datetime.fromisoformat(row['opened_at']),
-                                  state='closed')
-                    follow_ups = strategy.on_sell_fill(lot_obj, decision_candle) or []
-            else:
-                follow_ups = []
-            executor.execute_intents(sb, follow_ups, mode=mode, strategy=name,
-                                     pair=pair, config=config)
     else:
-        db.log_event(sb, 'error', 'live_reconcile_not_implemented',
-                     {'note': 'live mode requires Phase 5; see docs/human-actions.md'})
-        return 1
+        fills = executor.reconcile_live(sb, strategy=name, pair=pair)
+        for legacy_pair in ('XBTUSD', 'ETHUSD'):
+            for fill in executor.reconcile_live(sb, strategy='legacy',
+                                                pair=legacy_pair):
+                db.log_event(sb, 'info', 'legacy_exit_filled', {
+                    'lot_id': (fill['lot'] or {}).get('id'),
+                    'price': fill['price'],
+                    'volume': float(fill['order']['volume'])})
+    process_fills(sb, fills, strategy, decision_candle,
+                  mode=mode, name=name, pair=pair, config=config)
 
     # 3. Decide.
     broker = executor.DbBroker(sb, mode, name)
     cancel_stale_entries(sb, broker, params)
     portfolio = executor.load_portfolio(sb, mode, name, params['budget_usd'])
-    if not risk.data_fresh(candles):
+    gate_open = mode == 'paper' or executor.live_gate_open(config)
+    if not gate_open:
+        db.log_event(sb, 'warn', 'live_gate_closed_skip_execution',
+                     {'note': 'reconcile + snapshot only; see docs/human-actions.md item 7'})
+        intents = []
+    elif not risk.data_fresh(candles):
         db.log_event(sb, 'error', 'stale_market_data',
                      {'latest': str(candles["ts"].iloc[-1])})
         intents = []
@@ -149,6 +169,10 @@ def cycle() -> int:
                                   equity=equity)
     executor.execute_intents(sb, allowed, mode=mode, strategy=name, pair=pair,
                              config=config)
+
+    # 3b. Legacy lot exits (live only; self-guards on gate + validate-only).
+    if mode == 'live':
+        legacy.manage(sb, config)
 
     # 4. Snapshot + alerting.
     monitor.snapshot_and_alert(sb, mode=mode, strategy=name, pair=pair,
@@ -173,5 +197,9 @@ def main() -> int:
         return 1
 
 
-if __name__ == '__main__':
+def cli() -> None:
     sys.exit(main())
+
+
+if __name__ == '__main__':
+    cli()
