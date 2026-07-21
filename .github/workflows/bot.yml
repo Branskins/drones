@@ -30,5 +30,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SMTP_APP_PASSWORD: ${{ secrets.SMTP_APP_PASSWORD }}
           ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
-          # ALLOW_LIVE is deliberately NOT set here. Live trading requires a
-          # human to add it (Phase 5) — see docs/human-actions.md.
+          # First of the two live gates. Real orders ALSO require
+          # strategy_config.confirm_live=true, and only stop being validate-only
+          # once strategy_config.live_validate_only=false — see docs/human-actions.md item 7.
+          ALLOW_LIVE: "1"
