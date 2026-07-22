@@ -33,9 +33,19 @@ def hydrate_strategy(sb, strategy, *, mode: str, candles, config: dict) -> None:
         state['last_entry_ts'] = datetime.fromisoformat(rows[0]['created_at'])
     sma_days = int(config.get('sma_days', 30))
     state['closes'] = list(candles['close'].tail(sma_days))
-    any_orders = (sb.table('orders').select('id').eq('mode', mode)
-                  .eq('strategy', name).limit(1).execute().data)
-    state['initialized'] = bool(any_orders)
+    # "Initialized" means the strategy currently has something working in the
+    # market: a live order or an open lot. Terminal orders (canceled/failed/
+    # filled) do NOT count — otherwise a run that only produced canceled
+    # orders (e.g. a validate-only smoke test) would leave the grid believing
+    # its ladder exists, and it would never place rungs again.
+    live_orders = (sb.table('orders').select('id').eq('mode', mode)
+                   .eq('strategy', name)
+                   .in_('state', ['pending', 'submitted', 'open'])
+                   .limit(1).execute().data)
+    open_lots = (sb.table('lots').select('id').eq('mode', mode)
+                 .eq('strategy', name).neq('state', 'closed')
+                 .limit(1).execute().data)
+    state['initialized'] = bool(live_orders or open_lots)
     state['peak_equity'] = risk.peak_equity(sb, mode)
     strategy.hydrate(**state)
 
