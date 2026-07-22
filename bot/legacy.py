@@ -58,6 +58,22 @@ def manage(sb, config: dict) -> None:
             broker.cancel(order.id)
             db.log_event(sb, 'info', 'legacy_sell_window_exit',
                          {'lot_id': lot_id, 'order_id': order.id})
+            del resting[lot_id]
+
+    # Self-correct stale prices: if a lot's target was raised (e.g. the fee
+    # assumption changed), a sell resting BELOW it would now sell too cheap.
+    # Cancel it; the placement loop below re-rests it at the correct price.
+    # A sell above its target is already better than required — leave it.
+    targets = {l['id']: float(l['target_price']) for l in lots}
+    for lot_id, order in list(resting.items()):
+        target = targets.get(lot_id)
+        if target is not None and order.price is not None \
+                and order.price < target - 0.01:
+            broker.cancel(order.id)
+            db.log_event(sb, 'info', 'legacy_sell_reprice',
+                         {'lot_id': lot_id, 'old_price': order.price,
+                          'new_target': target})
+            del resting[lot_id]
 
     # Fill slots: place resting sells for window lots that lack one.
     for lot in in_window:
