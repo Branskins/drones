@@ -155,6 +155,15 @@ def _apply_fill(sb, row: dict, *, mode: str, volume: float, price: float,
             'proceeds_usd': round(cost - fee, 6),
             'sell_order_id': row['id']})
         lot_row = {'id': row['lot_id']}
+        # Bridge to the old pipeline accounting: a legacy lot maps 1:1 to a
+        # pre-bot `trades` buy via base_ledger_id. Flip that row to 'sold' so
+        # realized_pnl reflects the exit. Grid lots have no base_ledger_id and
+        # are skipped inside mark_trade_sold.
+        lot = (sb.table('lots').select('base_ledger_id')
+               .eq('id', row['lot_id']).execute().data)
+        base_ledger_id = lot[0]['base_ledger_id'] if lot else None
+        if base_ledger_id and row.get('kraken_txid'):
+            db.mark_trade_sold(sb, base_ledger_id, row['kraken_txid'])
     return {'order': row, 'lot': lot_row, 'price': price, 'fee': fee}
 
 

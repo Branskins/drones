@@ -78,6 +78,21 @@ def update_lot(sb: Client, lot_id: int, fields: dict) -> None:
     sb.table('lots').update(fields).eq('id', lot_id).execute()
 
 
+def mark_trade_sold(sb: Client, base_ledger_id: str, order_txid: str) -> int:
+    """Bridge bot -> old pipeline accounting: flip the pre-bot `trades` buy row
+    a legacy lot came from to status='sold' and stamp the sell's order_txid, so
+    `pipeline.py`'s sync_realized_pnl picks it up. Idempotent (only flips a row
+    still marked 'available'). Returns rows affected. No-op for lots with no
+    matching trades row (e.g. grid lots, which never existed in `trades`)."""
+    res = (sb.table('trades')
+           .update({'status': 'sold', 'order_txid': order_txid})
+           .eq('base_ledger_id', base_ledger_id)
+           .eq('side', 'buy')
+           .eq('status', 'available')
+           .execute())
+    return len(res.data or [])
+
+
 def lots(sb: Client, mode: str, strategy: str | None = None,
          states: list[str] | None = None) -> list[dict]:
     q = sb.table('lots').select('*').eq('mode', mode)

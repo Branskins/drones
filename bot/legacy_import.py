@@ -121,14 +121,47 @@ def window_report(sb, config: dict) -> None:
     print(f'\n{eligible} lot(s) inside the placement window. No orders placed here.')
 
 
+def backfill_trades(sb) -> None:
+    """One-time reconcile: for every already-closed legacy lot, flip its pre-bot
+    `trades` buy row to 'sold' with the sell's order_txid. Idempotent — lots
+    whose trades row is already sold are skipped. New closures are handled live
+    in bot/executor.py:_apply_fill; this catches lots closed before that wiring."""
+    closed = [l for l in db.lots(sb, 'live', 'legacy', states=['closed'])
+              if l.get('base_ledger_id')]
+    flipped = 0
+    for lot in closed:
+        if not lot.get('sell_order_id'):
+            print(f"  lot {lot['id']}: no sell_order_id, skipped")
+            continue
+        order = (sb.table('orders').select('kraken_txid')
+                 .eq('id', lot['sell_order_id']).execute().data)
+        txid = order[0]['kraken_txid'] if order else None
+        if not txid:
+            print(f"  lot {lot['id']}: sell order has no kraken_txid, skipped")
+            continue
+        n = db.mark_trade_sold(sb, lot['base_ledger_id'], txid)
+        if n:
+            flipped += 1
+            print(f"  lot {lot['id']} ({lot['base_ledger_id']}) -> trades sold, "
+                  f"order_txid={txid}")
+    print(f'backfilled {flipped} trades row(s); '
+          f'{len(closed)} closed legacy lot(s) checked')
+    print('run `python pipeline.py` (or sync_realized_pnl) to populate realized_pnl')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--recompute-targets', action='store_true',
                         help='refresh targets of existing lots from current config')
+    parser.add_argument('--backfill-trades', action='store_true',
+                        help='flip closed legacy lots to sold in the old trades table')
     args = parser.parse_args()
 
     sb = db.client()
     config = db.load_config(sb)
+    if args.backfill_trades:
+        backfill_trades(sb)
+        return
     if args.recompute_targets:
         recompute_targets(sb, config)
     else:
