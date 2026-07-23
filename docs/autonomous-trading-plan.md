@@ -32,6 +32,12 @@ Two conclusions fall out immediately:
    ~1.9% round trip before the market moves. A "+2% take profit" is roughly break-even; the
    observed +0.86% exit was a net loss once entry fee is included in the basis. Fixing fees
    (spot limit orders + cheaper funding) is worth more than any strategy change.
+   **Post-go-live correction (2026-07-22):** the account's *actual* maker fee is **0.40%**,
+   not the 0.25% originally assumed — the first real legacy fills netted +0.85% against a +1%
+   target, and the implied fee was 0.40%. `strategy_config.fee_maker_pct` was set to `0.40`
+   and every stored legacy target recomputed. All net-target math in the bot now uses 0.40%.
+   Getting the account onto a lower maker tier (volume-based) remains the highest-leverage
+   improvement available.
 2. **Take-profit-only DCA has no exit for downtrends.** Cash converts into inventory that can
    only leave at a profit, so in a falling market capital gets locked (78/78 lots stuck, some
    bought at BTC $110k vs $62.6k today). The strategy realized $9 while accumulating $1,632
@@ -385,20 +391,26 @@ sell button is rewired through the same `orders` path (fixing F5 via the optimis
 
 ## 8. Roadmap
 
-| Phase | Deliverable | Acceptance criteria |
-|---|---|---|
-| **0. Foundations** | Fee fix decision (API limit orders + ACH funding); fix F5 double-sell lock, F8 partial-fill aggregation, F9 incremental sync, F10 nonce; new tables migrated | manual sell path is race-safe; pipeline run is O(new rows); `realized_pnl` correct on a synthetic partial fill |
-| **1. Data + backtester** | OHLC loader (historical CSVs + API tail); engine + metrics + walk-forward harness | engine replays the real baseline trades and matches `realized_pnl` within rounding |
-| **2. Strategy study** | S1/S2/S3 implemented against the Strategy interface; walk-forward report | written comparison with out-of-sample equity curves per regime; parameters chosen from plateaus; go/no-go per strategy |
-| **3. Paper bot** | executor + risk manager + reconcile loop in `paper` mode on a 15-min schedule | ≥ 2 weeks unattended paper run: zero unreconciled orders, zero guardrail false-negatives, paper equity tracks backtest expectation |
-| **4. Monitoring** | snapshots, alerts (email), `/performance` page, weekly report | drawdown/staleness/drift alerts land in the inbox in induced-failure tests |
-| **5. Gated live** | live mode with `budget_usd=100`, kill switch, then scale to $500 | 4 weeks live within guardrails and tracking paper before budget increases |
-| **6. Legacy exit rollout** | import the 78 lots as `strategy='legacy'`; rolling-window resting limit sells at +1% net | every legacy lot has a stored target; nearest-target lots have live GTC sells; window respects the open-order cap |
+Status as of 2026-07-22: **all phases complete — the bot is live** (grid on XBTUSD,
+$500 budget, 7-rung ladder resting; legacy +1%-net exits active). See
+`docs/live-operations.md` for the running runbook and the learnings from go-live.
 
-Phase 0 and 1 are independent and can run in parallel. Nothing trades live before Phase 5, and
-paper mode never places an executable order (`validate=true` only). Phase 6 places live *limit
-sell* orders only (no buys, no market orders) and can ship as soon as the orders state machine
-(Phase 0) is trusted — it doesn't need to wait for the strategy study.
+| Phase | Deliverable | Status |
+|---|---|---|
+| **0. Foundations** | Fee fix decision (API limit orders + ACH funding); fix F5 double-sell lock, F8 partial-fill aggregation, F9 incremental sync, F10 nonce; new tables migrated | ✅ done |
+| **1. Data + backtester** | OHLC loader (historical CSVs + API tail); engine + metrics + walk-forward harness | ✅ done (engine replays baseline to the cent) |
+| **2. Strategy study** | S1/S2/S3 implemented against the Strategy interface; walk-forward report | ✅ done (12y study; grid+recentering chosen) |
+| **3. Paper bot** | executor + risk manager + reconcile loop in `paper` mode on a 15-min schedule | ✅ done (ran 07-09→07-21; 0 unreconciled) |
+| **4. Monitoring** | snapshots, alerts (email), `/performance` page, weekly report | ✅ done (snapshots + email; weekly report pending) |
+| **5. Gated live** | live mode, kill switch, then scale to $500 | ✅ done — went live 2026-07-22 at $500 |
+| **6. Legacy exit rollout** | import the 78 lots as `strategy='legacy'`; rolling-window resting limit sells at +1% net | ✅ done — 4 lots already closed at +$3.26 net |
+
+The paper run (Phase 3) never organically filled a rung (BTC never dipped into the
+ladder), so the buy→sell fill path was first exercised with real money — a deviation
+from the "paper equity tracks backtest" acceptance criterion, accepted knowingly. The
+live rollout instead leaned on a **validate-only smoke test** (`mode=live` +
+`live_validate_only=true`) to exercise the submit path before real orders. That
+sequence, and the bugs it surfaced, are documented in `docs/live-operations.md`.
 
 ---
 

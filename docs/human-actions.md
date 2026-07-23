@@ -1,8 +1,10 @@
 # Human actions required
 
-Things the autonomous implementation could not do itself. Ordered by phase;
-nothing in the paper phase is blocked — items 1–4 unlock alerts + CI, items
-5–7 gate real money.
+Things the autonomous implementation could not do itself. Ordered by phase.
+
+> **Status 2026-07-22: all items below are DONE — the bot is live.** Items 1–4
+> activated CI + alerts, items 5–8 took it to real trading. This file is kept as
+> the setup record; day-to-day operation lives in `docs/live-operations.md`.
 
 ## To activate the scheduled paper bot (Phase 3/4)
 
@@ -37,6 +39,10 @@ nothing in the paper phase is blocked — items 1–4 unlock alerts + CI, items
 6. **Fund/verify prerequisites**: switch deposits to ACH/wire (card deposits cost
    3.8% — $190 on the $5k baseline); confirm account tier's max open orders
    (needed for the legacy rolling window + grid rungs).
+   **Note (2026-07-22):** first real fills revealed the account's maker fee is
+   **0.40%**, not the assumed 0.25% — `fee_maker_pct` was corrected and targets
+   recomputed. Reaching a lower maker tier (Kraken volume tiers) is the remaining
+   high-leverage cost improvement; still open.
 7. **Open the live gate** — BOTH must be set, by a human:
    - `strategy_config`: `confirm_live` = `true`, and `live_validate_only` = `false`
      (until then AddOrder is called with `validate=true` and executes nothing).
@@ -67,9 +73,14 @@ nothing in the paper phase is blocked — items 1–4 unlock alerts + CI, items
    activates only when the Phase 5 gate is open AND `live_validate_only` is
    false; no separate step needed.
 
-## Open decisions
+## Still open (post-go-live)
 
 9. Whether monitoring should report staking yield (BABY / ETH staking ledger rows)
    as a passive-income line (left out of scope for now).
-10. Review and commit the changes on `main` — nothing has been committed; see the
-    session summary for the file list.
+10. Reach a lower Kraken maker-fee tier (see item 6) — the biggest remaining
+    per-trade cost lever now that entries use post-only limit orders.
+11. Grid partial-ladder self-heal + weekly summary email — see the "Known
+    limitations" in `docs/live-operations.md`.
+
+(The earlier "commit the changes on main" item is done — the bot is deployed and
+running from `main`.)
